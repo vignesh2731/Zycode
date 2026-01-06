@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User{
+  id                    Int           @id @default(autoincrement())
+  name                  String 
+  username              String        @unique
+  password              String
+  contestsCreated       Contest[]     @relation(name:"contest-creator")
+  contestsParticipated  Contest[]     @relation(name:"contest-participation")
+  questionCompleted     Problem[]
+  winner                Contest[]     @relation(name:"contest-winner")
+}
+
+model Contest{
+  id                  String          @id @default(cuid())
+  createdAt           DateTime        @default(now())
+  isCompleted         ContestStatus   @default(NotCompleted)
+  createdBy           Int 
+  createdByUser       User            @relation(fields:[createdBy],references:[id],name:"contest-creator")
+  participatedUsers   User[]          @relation(name:"contest-participation")
+  problems            Problem[]
+  winner              Int?
+  winnerUser          User?            @relation(fields: [winner],references: [id],name: "contest-winner")
+
+  @@index([createdAt])
+  @@index([winner])
+  @@index([isCompleted])
+  @@index([createdBy])
+}
+
+model Problem{
+  id                  String          @id @default(cuid())
+  title               String 
+  description         String 
+  contestId           String 
+  contest             Contest         @relation(fields:[contestId],references:[id])
+  testcases           TestCase[]
+  completed           ContestStatus   @default(NotCompleted)
+  completedBy         Int?
+  completedUser       User?           @relation(fields: [completedBy],references: [id])
+  problemNumber       Int
+
+  @@index([contestId])
+  @@index([completed])
+  @@index([completedBy])
+  @@index([contestId,problemNumber])
+
+}
+
+model TestCase{
+  id                  String          @id @default(cuid())
+  problemId           String 
+  testCase            String 
+  result              String
+  order               Int 
+  problem             Problem         @relation(fields:[problemId],references:[id])
+
+  @@index([problemId])
+  @@index([problemId,order])
+}
+
+
+enum ContestStatus {
+  Completed 
+  NotCompleted 
+}
