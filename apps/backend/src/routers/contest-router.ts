@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { prisma } from '@repo/db/client'
-import { z } from 'zod'
 
 import type { CustomRequest } from "../types/types.js";
 import { ContestDataSchema } from '@repo/zod'
@@ -10,8 +9,8 @@ export const contestRouter : Router = Router();
 
 
 contestRouter.post("/create",async (req:CustomRequest,res)=>{
-    const {problemMetadata} = req.body;
-    const safeParsedData = z.safeParse(ContestDataSchema,problemMetadata);
+    const problemMetadata = req.body;
+    const safeParsedData = ContestDataSchema.safeParse(problemMetadata)
     if(!safeParsedData.success){
         return res.status(401).json({
             msg: "Wrong inputs"

@@ -1,5 +1,7 @@
 import { createClient } from 'redis'
 import { prisma } from '@repo/db/client'
+import type { SubmissionDataType } from '@repo/zod/types'
+type ParsedDataType = SubmissionDataType & {userId : number};
 async function main(){
     const redis = createClient({url: "redis://localhost:6379"});
     await redis.connect();
@@ -7,10 +9,9 @@ async function main(){
     while(1){
         const response = await redis.lPop("submissions");
         if(!response)continue;
-        const parsedData = JSON.parse(response);
+        const parsedData = JSON.parse(response) as ParsedDataType;
         console.log(parsedData);
-        const problemId = parsedData["problemId"],userId = parsedData["userId"];
-        const contestId = parsedData["contestId"],code = parsedData.code;
+        const { problemId, userId, contestId, code,language} = parsedData;
         const [data,name,totalProblems,problemMetadata] = await Promise.all([prisma.testCase.findMany({
                 where:{
                     problemId:problemId
@@ -57,7 +58,6 @@ async function main(){
         const testcases = data.map(d=>d.testCase);
         const ans = func(code,testcases);
         let accepted = true,ended = false;
-
         if(accepted){
             await prisma.problem.update({
                 where:{
@@ -107,7 +107,7 @@ async function main(){
             userId,
             type: "submission_status",
             accepted,
-            name,
+            name:name?.name,
             ended
         }))
     }

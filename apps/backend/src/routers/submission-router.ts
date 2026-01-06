@@ -4,7 +4,6 @@ import { createClient } from "redis";
 
 import type { CustomRequest } from "../types/types.js";
 import { SubmissionDataSchema } from "@repo/zod";
-import z from "zod";
 
 export const submissionRouter:Router = Router();
 
@@ -15,7 +14,7 @@ async function connect(){
 connect();
 
 submissionRouter.post("/submit",async(req:CustomRequest,res)=>{
-    const safeParsedData = z.safeParse(SubmissionDataSchema,req.body);
+    const safeParsedData = SubmissionDataSchema.safeParse(req.body);
     if(!safeParsedData.success){
         return res.status(401).json({
             msg: "Wrong inputs"
@@ -23,7 +22,7 @@ submissionRouter.post("/submit",async(req:CustomRequest,res)=>{
     }
     const {problemId,contestId,code,language} = safeParsedData.data;
     const userId = req.id;
-    await redis.rPush?.("submissions",JSON.stringify({problemId,contestId,code,userId}))
+    await redis.rPush?.("submissions",JSON.stringify({problemId,contestId,code,userId,language}))
     res.json({
         msg: "Code submitted"
     })

@@ -13,7 +13,7 @@ wss.addListener("connection",(ws)=>{
         const msgAsString = msg.toString('utf-8');
         const parsedData = JSON.parse(msgAsString);
         console.log("Parsed message",parsedData);
-        if(parsedData.type==='submission'){
+        if(parsedData.type==='submission_status'){
             if(parsedData.accepted){
                 contestRoom.get(parsedData.contestId)?.map(user=>{
                     user.send(JSON.stringify({type: "contest_ended",winner:parsedData.winner}));

@@ -13,6 +13,7 @@
     "zod": "^4.3.5"
   },
   "exports":{
-    ".": "./dist/zod.js"
+    ".": "./dist/zod.js",
+    "./types": "./dist/zod.d.ts"
   }
 }
