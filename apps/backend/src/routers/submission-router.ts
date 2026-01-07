@@ -15,14 +15,17 @@ connect();
 
 submissionRouter.post("/submit",async(req:CustomRequest,res)=>{
     const safeParsedData = SubmissionDataSchema.safeParse(req.body);
+
     if(!safeParsedData.success){
         return res.status(401).json({
             msg: "Wrong inputs"
         })
     }
+
     const {problemId,contestId,code,language} = safeParsedData.data;
     const userId = req.id;
     await redis.rPush?.("submissions",JSON.stringify({problemId,contestId,code,userId,language}))
+    
     res.json({
         msg: "Code submitted"
     })

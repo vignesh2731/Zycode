@@ -9,16 +9,19 @@ const contestRoom = new Map<string,WebSocket[]>();
 const userContestMapping = new Map<number,string>();
 
 wss.addListener("connection",(ws)=>{
-    ws.on('message',(msg,isBinary)=>{
+    ws.on('message',(msg)=>{
         const msgAsString = msg.toString('utf-8');
         const parsedData = JSON.parse(msgAsString);
+
         console.log("Parsed message",parsedData);
+
         if(parsedData.type==='submission_status'){
             if(parsedData.accepted){
                 contestRoom.get(parsedData.contestId)?.map(user=>{
-                    user.send(JSON.stringify({type: "contest_ended",winner:parsedData.winner}));
+                    user.send(JSON.stringify({msg:"Question_solved",solver: parsedData.name,ended: parsedData.ended, winner:parsedData.winner}));
                 })
             }
+
             else{
                 userRoom.get(parsedData.userId)?.send(JSON.stringify({type:"submission_status",status:"wrong"}));
             }

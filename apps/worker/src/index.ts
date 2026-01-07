@@ -1,18 +1,27 @@
 import { createClient } from 'redis'
 import { prisma } from '@repo/db/client'
 import type { SubmissionDataType } from '@repo/zod/types'
+import { string } from 'zod';
+
+
 type ParsedDataType = SubmissionDataType & {userId : number};
+
+
 async function main(){
     const redis = createClient({url: "redis://localhost:6379"});
     await redis.connect();
     const socket = new WebSocket("ws://localhost:8080");
+
+
     while(1){
         const response = await redis.lPop("submissions");
         if(!response)continue;
+
         const parsedData = JSON.parse(response) as ParsedDataType;
         console.log(parsedData);
+
         const { problemId, userId, contestId, code,language} = parsedData;
-        const [data,name,totalProblems,problemMetadata] = await Promise.all([prisma.testCase.findMany({
+        const [data,solver,totalProblems,problemMetadata] = await Promise.all([prisma.testCase.findMany({
                 where:{
                     problemId:problemId
                 },
@@ -29,7 +38,7 @@ async function main(){
                     id:userId
                 },
                 select:{
-                    name:true
+                    username:true
                 }
             }),
             prisma.contest.findFirst({
@@ -54,10 +63,15 @@ async function main(){
             })
         ])
         if(!data)continue;
+
+
         const result = data.map(d=>d.result);
         const testcases = data.map(d=>d.testCase);
         const ans = func(code,testcases);
+        let winner: undefined | string;
         let accepted = true,ended = false;
+        // Call to the code executor goes from here
+
         if(accepted){
             await prisma.problem.update({
                 where:{
@@ -89,16 +103,26 @@ async function main(){
                         res = user;
                     }
                 }
-                await prisma.contest.update({
+                let [_,user] = await Promise.all([prisma.contest.update({
                     where:{
                         id:contestId
                     },
                     data:{
-                        winner:res,
-                        isCompleted: "Completed"
+                        winner: res,
+                        isCompleted: 'Completed'
                     }
-                })
+                }),
+                    prisma.user.findFirst({
+                        where:{
+                            id: res
+                        },
+                        select:{
+                            username:true
+                        }
+                    })
+                ])
                 ended = true;
+                winner = user?.username;
             }
         }
         socket.send(JSON.stringify({
@@ -107,12 +131,17 @@ async function main(){
             userId,
             type: "submission_status",
             accepted,
-            name:name?.name,
-            ended
+            name:solver?.username,
+            ended,
+            winner
         }))
     }
 }
+
+
 function func(code:string,testcase:string[]){
     return [];
 }
+
+
 main();
