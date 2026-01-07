@@ -1,4 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
+import type { WebSocketDataType } from '@repo/zod'
 
 const wss = new WebSocketServer({port:8080});
 
@@ -11,7 +12,7 @@ const userContestMapping = new Map<number,string>();
 wss.addListener("connection",(ws)=>{
     ws.on('message',(msg)=>{
         const msgAsString = msg.toString('utf-8');
-        const parsedData = JSON.parse(msgAsString);
+        const parsedData = JSON.parse(msgAsString) as WebSocketDataType;
 
         console.log("Parsed message",parsedData);
 
@@ -26,7 +27,7 @@ wss.addListener("connection",(ws)=>{
                 userRoom.get(parsedData.userId)?.send(JSON.stringify({type:"submission_status",status:"wrong"}));
             }
         }
-        if(parsedData.type==='init'){
+        else if(parsedData.type==='init'){
             const contestId = parsedData.contestId, userId = parsedData.userId;
             userContestMapping.set(userId,contestId);
             socketRoom.set(ws,userId);

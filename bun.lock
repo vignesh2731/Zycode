@@ -69,6 +69,7 @@
     "apps/wss": {
       "name": "wss",
       "dependencies": {
+        "@repo/zod": "*",
         "@types/ws": "^8.18.1",
         "ws": "^8.18.3",
       },

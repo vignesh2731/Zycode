@@ -1,7 +1,6 @@
 import { createClient } from 'redis'
 import { prisma } from '@repo/db/client'
-import type { SubmissionDataType } from '@repo/zod/types'
-import { string } from 'zod';
+import type { SubmissionDataType, SubmissionStatusType } from '@repo/zod/types'
 
 
 type ParsedDataType = SubmissionDataType & {userId : number};
@@ -103,7 +102,7 @@ async function main(){
                         res = user;
                     }
                 }
-                let [_,user] = await Promise.all([prisma.contest.update({
+                let [contestData,user] = await Promise.all([prisma.contest.update({
                     where:{
                         id:contestId
                     },
@@ -125,16 +124,17 @@ async function main(){
                 winner = user?.username;
             }
         }
-        socket.send(JSON.stringify({
+        const dataToBeSent : SubmissionStatusType = {
             contestId,
             problemId,
             userId,
             type: "submission_status",
             accepted,
-            name:solver?.username,
+            name: solver?.username,
             ended,
             winner
-        }))
+        }
+        socket.send(JSON.stringify(dataToBeSent));
     }
 }
 

@@ -32,3 +32,23 @@ export const AuthSchema = z.object({
 })
 
 export type AuthData = z.infer<typeof AuthSchema>
+
+
+export type SubmissionStatusType = {
+    problemId:string,
+    contestId:string,
+    userId: number,
+    type: "submission_status",
+    accepted : boolean,
+    name ?: string,
+    winner ?:string,
+    ended :boolean
+} 
+
+export type WebSocketRegisterType = {
+    type: "init",
+    userId: number,
+    contestId: string
+}
+
+export type WebSocketDataType = SubmissionStatusType| WebSocketRegisterType;
