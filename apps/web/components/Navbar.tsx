@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { signOut } from "next-auth/react"
 
 export function Navbar({children}:{children:React.ReactNode}){
     const navBar = ["Home","Contest","Report"];
     const [theme,setTheme] = useState<'light'|'dark'>("light")
     return(
-        <div className={`${theme==='light'? 'bg-white text-black' : 'text-white bg-slate-900'} h-screen flex flex-col gap-2 text-xs md:text-sm lg:text-md`}>
+        <div className={` h-screen flex flex-col gap-2 text-xs md:text-sm lg:text-md`}>
             <div className={`grid grid-cols-2 md:px-10 p-4  border-b border-slate-100 shadow-sm font-sans`}>
                 <div className="flex gap-4 md:gap-16 items-center">
                     <Image src={'/logo.png'} alt="" width={40} height={20} />
@@ -19,7 +20,9 @@ export function Navbar({children}:{children:React.ReactNode}){
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer hover:bg-slate-300  rounded-full">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                     </svg>
-                    <p className="cursor-pointer">Logout</p>
+                    <p className="cursor-pointer" onClick={()=>{
+                        signOut({callbackUrl: 'http://localhost:3000/dashboard'});
+                    }}>Logout</p>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer rounded-full hover:bg-slate-300" onClick={()=>{
                         setTheme(theme==='light' ?'dark':'light')
                     }}>
@@ -27,7 +30,7 @@ export function Navbar({children}:{children:React.ReactNode}){
                     </svg>
                 </div>
             </div>
-            <div className={`${theme==='light'? 'bg-white text-black' : 'text-white bg-slate-900'} px-2 md:px-10 lg:px-20 pt-10`}>
+            <div className={`px-2 md:px-10 lg:px-20 pt-10`}>
                 {children}
             </div>
         </div>

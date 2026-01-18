@@ -2,15 +2,21 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "./Button"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { WebSocketSingleton } from "@/lib/ws";
 
-export function WaitingRoomClient(){
+export function WaitingRoomClient({id}:{id:string}){
     const router = useRouter();
+    const userId = 1;
     useEffect(()=>{
-        setTimeout(()=>{
-            /// check if the contest is started or not after every 5 second by hitting an api. 
-            // If the api returns a valid reponse then redirect the user to a contest page
-        },5000)
+        const w = WebSocketSingleton.getInstance(userId,id)
+        w?.addEventListener('message',(event)=>{
+            const data = String(event.data);
+            const parsedData = JSON.parse(data);
+            if(parsedData.msg==='Contest_Started'){
+                router.replace(`/contest/${id}/1`);
+            }
+        })
     },[])
     return(
         <div className="flex justify-end pr-20">

@@ -11,7 +11,7 @@ export default async function Page({params}:{params: Promise<{id:string}>}){
                 <div>
                     <p className="text-xl">{`Contest ID - ${id}`}</p>
                 </div>
-                <WaitingRoomClient />
+                <WaitingRoomClient id={id} />
             </div>
             <div className="grid grid-cols-4 gap-12">
                 {pariticipants.map((p,key)=>(

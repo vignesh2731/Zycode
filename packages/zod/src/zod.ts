@@ -51,4 +51,7 @@ export type WebSocketRegisterType = {
     contestId: string
 }
 
-export type WebSocketDataType = SubmissionStatusType| WebSocketRegisterType;
+export type WebSocketContestStartType = Omit<WebSocketRegisterType,'type'> & {type: 'contest_started'}
+
+
+export type WebSocketDataType = SubmissionStatusType| WebSocketRegisterType | WebSocketContestStartType;

@@ -18,13 +18,13 @@ wss.addListener("connection",(ws)=>{
 
         if(parsedData.type==='submission_status'){
             if(parsedData.accepted){
-                contestRoom.get(parsedData.contestId)?.map(user=>{
-                    user.send(JSON.stringify({msg:"Question_solved",solver: parsedData.name,ended: parsedData.ended, winner:parsedData.winner}));
+                contestRoom.get(parsedData.contestId)?.forEach(user=>{
+                    user.send(JSON.stringify({msg:"Correct",solver: parsedData.name,ended: parsedData.ended, winner:parsedData.winner}));
                 })
             }
 
             else{
-                userRoom.get(parsedData.userId)?.send(JSON.stringify({type:"submission_status",status:"wrong"}));
+                userRoom.get(parsedData.userId)?.send(JSON.stringify({msg:"Wrong"}));
             }
         }
         else if(parsedData.type==='init'){
@@ -35,6 +35,13 @@ wss.addListener("connection",(ws)=>{
             const room = contestRoom.get(contestId) || [];
             room.push(ws);
             contestRoom.set(contestId,room);
+        }
+        else if(parsedData.type==='contest_started'){
+            const contestId = parsedData.contestId;
+            const clients = contestRoom.get(contestId);
+            clients?.forEach((c)=>{
+                c.send(JSON.stringify({msg: "Contest_Started"}));
+            })
         }
 
     })
