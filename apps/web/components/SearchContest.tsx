@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Button } from "./Button"
 import { InputBox } from "./Inputbox"
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 enum ContestJoinStatus{
     Correct = "Joined Successfully",
@@ -13,7 +14,8 @@ export function InputWithButton() {
     const [msg,setMsg] = useState<ContestJoinStatus|null>(null);
     const [id,setId] = useState("");
     const router = useRouter();
-
+    const session = useSession();
+    const userId = session.data?.user.id;
     async function onSubmit(){
         // send req to the backend and based on that route to the page or display error message
         /// const res = await axios.post("URL",{id:id,headers:authorization:jwt});

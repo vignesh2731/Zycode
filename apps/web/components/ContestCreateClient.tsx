@@ -6,6 +6,7 @@ import { QuestionDetails } from "@/types/types";
 import { Button } from "./Button";
 import { ContestDataSchema } from '@repo/zod'
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export function ContestCreateClient(){
     const[noOfQuestions,setNoOfQuestions] = useState<number>(1);
@@ -15,6 +16,8 @@ export function ContestCreateClient(){
     const testcaseTimeout = useRef<ReturnType<typeof setTimeout>| null>(null);
     const resultTimeout = useRef<ReturnType<typeof setTimeout>| null>(null);
     const router = useRouter();
+    const session = useSession();
+    const userId = session?.data?.user.id;
 
     function addResult(value:string,problemNo:number,testCaseNo:number){
         if(resultTimeout.current){
