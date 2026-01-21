@@ -35,7 +35,7 @@ export default function WinnerPage({ winner, contestCode }: { winner: string, co
 
 
       <Link 
-        href="/"
+        href="/dashboard"
         className="px-6 py-3 bg-white text-purple-700 font-bold rounded-2xl shadow-lg hover:scale-110 transition-all"
       >
         Go to Dashboard

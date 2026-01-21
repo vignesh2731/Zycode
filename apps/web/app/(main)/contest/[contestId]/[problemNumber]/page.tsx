@@ -1,6 +1,7 @@
 import { CodeEditorClient } from "@/components/CodeEditorClient";
 import { QuestionDisplay } from "@/components/QuestionDisplay";
 import { authOptions } from "@/lib/auth";
+import axios from "axios";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation"
 
@@ -10,9 +11,16 @@ export default async function Page({params}:{params: Promise<{contestId:string,p
     if(!session?.user){
         redirect('/api/auth/signup');
     }
-    // fetch title, description from the backend server
-    const title = "fihdsjfaisodfjasiodfsadf";
-    const description = "hi";
+    const { data } = await axios.get(`${process.env.BACKEND_URL}/api/contest/${contestId}/${problemNumber}`,{
+        headers:{
+            Authorization: session.user.token
+        }
+    })
+    if(!data){
+        throw new Error("Invalid Contest ID or Problem Number")
+    }
+    const title = data.title
+    const description = data.title;
     return(
         <div className="grid md:grid-cols-2 gap-10">
             <QuestionDisplay title={title} description={description}/>

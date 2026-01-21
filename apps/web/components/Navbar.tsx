@@ -3,17 +3,23 @@
 import Image from "next/image";
 import { useState } from "react";
 import { signOut } from "next-auth/react"
+import { useRouter } from "next/navigation";
 
 export function Navbar({children}:{children:React.ReactNode}){
-    const navBar = ["Home","Contest","Report"];
+    const navBar = [{name:"Home",href:'dashboard'},{name:"Contest",href:"contest/create"},{name:"Report",href:'report'}];
     const [theme,setTheme] = useState<'light'|'dark'>("light")
+    const router = useRouter();
     return(
         <div className={` h-screen flex flex-col gap-2 text-xs md:text-sm lg:text-md`}>
             <div className={`grid grid-cols-2 md:px-10 p-4  border-b border-slate-100 shadow-sm font-sans`}>
                 <div className="flex gap-4 md:gap-16 items-center">
-                    <Image src={'/logo.png'} alt="" width={40} height={20} />
+                    <Image src={'/logo.png'} alt="" width={40} height={20} className="cursor-pointer" onClick={()=>{
+                        router.push('/')
+                    }} />
                     {navBar.map((nv,key)=>(
-                        <div key={key} className={`cursor-pointer  ${theme==='light' ? 'hover:text-black text-slate-600' : 'hover:text-gray-400'}`}>{nv}</div>
+                        <div key={key} onClick={()=>{
+                            router.push(`/${nv.href}`)
+                        }} className={`cursor-pointer  ${theme==='light' ? 'hover:text-black text-slate-600' : 'hover:text-gray-400'}`}>{nv.name}</div>
                     ))}
                 </div>
                 <div className="flex justify-end gap-4 md:gap-32 items-center">

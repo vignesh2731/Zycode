@@ -3,10 +3,11 @@ import { prisma } from '@repo/db/client'
 
 import type { CustomRequest } from "../types/types.js";
 import { ContestDataSchema } from '@repo/zod'
+import { middleware } from "../middleware/middlware.js";
 
 
 export const contestRouter : Router = Router();
-
+contestRouter.use(middleware);
 
 contestRouter.post("/create",async (req:CustomRequest,res)=>{
     const problemMetadata = req.body;
@@ -17,10 +18,8 @@ contestRouter.post("/create",async (req:CustomRequest,res)=>{
             msg: "Wrong inputs"
         })
     }
-
     const problemData = safeParsedData.data;
     const userId = req.id;
-
     const response = await prisma.contest.create({
         data:{
             createdBy:userId!,
@@ -48,6 +47,19 @@ contestRouter.post("/create",async (req:CustomRequest,res)=>{
         }
     })
 
+    await prisma.contest.update({
+        where:{
+            id:response.id
+        },
+        data:{
+            participatedUsers:{
+                connect:{
+                    id:userId
+                }
+            }
+        }
+    })
+
     res.json({
         contestId: response.id,
         msg: "Contest_created"
@@ -57,7 +69,17 @@ contestRouter.post("/create",async (req:CustomRequest,res)=>{
 contestRouter.post("/join",async(req:CustomRequest,res)=>{
     const {contestId} = req.body;
     const userId = req.id;
-
+    const data = await prisma.contest.findFirst({
+        where:{
+            id: contestId
+        },
+        select:{
+            id:true
+        }
+    })
+    if(!data){
+        return res.json({msg: "Contest Not found"});
+    }
     await prisma.contest.update({
         where:{
             id:contestId
@@ -72,7 +94,8 @@ contestRouter.post("/join",async(req:CustomRequest,res)=>{
     })
 
     res.json({
-        msg: "Contest joined"
+        msg: "Contest joined",
+        id:data.id
     })
 })
 
@@ -92,7 +115,6 @@ contestRouter.post("/exit",async(req:CustomRequest,res)=>{
             }
         }
     })
-
     res.json({
         msg: "Contest exited"
     })
@@ -117,12 +139,13 @@ contestRouter.get("/get-problems/:contestId",async(req,res)=>{
     res.json(problems?.problems)
 })
 
-contestRouter.get("/problems/:problemId",async(req:CustomRequest,res)=>{
-    const { problemId } = req.params;
+contestRouter.get("/problems/:contestId/:problemNumber",async(req:CustomRequest,res)=>{
+    const { contestId, problemNumber } = req.params;
 
     const problem = await prisma.problem.findFirst({
         where:{
-            id: problemId
+            problemNumber: Number(problemNumber),
+            contestId: contestId
         },
         select:{
             title: true,
@@ -146,7 +169,7 @@ contestRouter.get("/result/:contestId",async(req:CustomRequest,res)=>{
     })
 
     if(!response){
-        return res.json({
+        return res.status(403).json({
             msg: "Invalid contest ID "
         })
     }
@@ -157,7 +180,7 @@ contestRouter.get("/result/:contestId",async(req:CustomRequest,res)=>{
     }
 
     const winnerId = response.winner;
-    const winnerName = await prisma.user.findFirst({
+    const data = await prisma.user.findFirst({
         where:{
             id:winnerId!
         },
@@ -167,5 +190,5 @@ contestRouter.get("/result/:contestId",async(req:CustomRequest,res)=>{
         }
     })
 
-    res.json(winnerName);
+    res.json({name:data?.name});
 })

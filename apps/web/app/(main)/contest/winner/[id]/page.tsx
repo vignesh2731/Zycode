@@ -1,5 +1,6 @@
 import WinnerPage from "@/components/Winner";
 import { authOptions } from "@/lib/auth";
+import axios from "axios";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
@@ -9,8 +10,12 @@ export default async function Page({params}:{params: Promise<{id:string}>}){
         redirect('/api/auth/signin');
     }
     const {id} = await params;
-    const name = "Vignesh";
-    // const name = getWinner();
+    const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contest/result/${id}`,{
+        headers:{
+            Authorization: `Bearer ${session.user.token}`
+        }
+    });
+    const name = res.data.name;
     if(name){
         return (
             <div className="h-screen">

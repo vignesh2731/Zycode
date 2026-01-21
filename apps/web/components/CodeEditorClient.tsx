@@ -4,15 +4,19 @@ import CodeEditor from "./CodeEditor";
 import { Button } from "./Button";
 import { WebSocketSingleton } from "@/lib/ws";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useSession } from "next-auth/react";
 
 export function CodeEditorClient({contestId,problemNumber}:{contestId:string,problemNumber:number}){
     const[code,setCode] = useState("");
     const[submissionStatus,setSubmissionStatus] = useState<'Accepted'|'Wrong' | 'Loading...' | null>(null);
     const [solver,setSolver] = useState("");
-    const userId = 1;
+    const[language,setLanguage] = useState("");
+    const session = useSession();
+    const userId = session.data?.user.id 
     const router = useRouter();
     useEffect(()=>{
-        const socket = WebSocketSingleton.getInstance(userId,contestId);
+        const socket = WebSocketSingleton.getInstance(Number(userId),contestId);
         socket?.addEventListener('message',async(event)=>{
             const message = event.data.toString('utf-8');
             const parsedData = JSON.parse(message);
@@ -46,13 +50,23 @@ export function CodeEditorClient({contestId,problemNumber}:{contestId:string,pro
                 }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
-                <select className="border-2 border-slate-300 rounded-sm w-20 p-2">
+                <select className="border-2 border-slate-300 rounded-sm w-20 p-2" onChange={(e)=>setLanguage(e.target.value)}>
                     <option defaultValue={"C++"}>C++</option>
                     <option value="Java">Java</option>
                     <option value="Python">Python</option>
                 </select>
                 <Button label="Submit" className={`px-4 w-fit p-2 rounded-md border border-slate-200 text-green-500 font-[550] bg-gray-100 hover:bg-gray-300`} onClick={()=>{
-                    setSubmissionStatus('Loading...')
+                    setSubmissionStatus('Loading...');
+                    axios.post(`${process.env.BACKEND_URL}/api/submission/submit`,{
+                        code:code,
+                        language:language,
+                        contestId:contestId,
+                        problemId:problemNumber
+                    },{
+                        headers:{
+                            Authorization: session.data?.user.token
+                        }
+                    })
                 }} />
             </div>
             <CodeEditor code={code} setCodeAction={(value)=>{

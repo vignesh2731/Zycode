@@ -7,6 +7,7 @@ import { Button } from "./Button";
 import { ContestDataSchema } from '@repo/zod'
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import axios from "axios";
 
 export function ContestCreateClient(){
     const[noOfQuestions,setNoOfQuestions] = useState<number>(1);
@@ -17,7 +18,6 @@ export function ContestCreateClient(){
     const resultTimeout = useRef<ReturnType<typeof setTimeout>| null>(null);
     const router = useRouter();
     const session = useSession();
-    const userId = session?.data?.user.id;
 
     function addResult(value:string,problemNo:number,testCaseNo:number){
         if(resultTimeout.current){
@@ -29,7 +29,6 @@ export function ContestCreateClient(){
             testcases[testCaseNo] = {...(testcases[testCaseNo] ?? {testcase:'',result: ''}),result:value};
             updated[problemNo] = { ...updated[problemNo]!,testcase: testcases};
             setQuestions(updated);
-            // console.log(updated);
         },1000)
     }
 
@@ -43,7 +42,6 @@ export function ContestCreateClient(){
             testcases[testCaseNo] = {...(testcases[testCaseNo] ?? {testcase:'',result: ''}),testcase:value};
             updated[problemNo] = { ...updated[problemNo]!,testcase: testcases};
             setQuestions(updated);
-            // console.log(updated);
         },1000)
     }
 
@@ -67,12 +65,10 @@ export function ContestCreateClient(){
             const updated = [...questions];
             updated[idx] = {...updated[idx]!,description:value};
             setQuestions(updated);
-            // console.log(updated);
         },2000)
     }
     async function onSubmit(){
-        // console.log(questions);
-        /// verify this using zod and then send it to the backend for creation and redirect the user to the waiting room
+
         const contestData = questions.map((q,idx)=>(
             {
                 title: q.title,
@@ -84,11 +80,16 @@ export function ContestCreateClient(){
         const parsedData = ContestDataSchema.safeParse(contestData);
         if(!parsedData.success){
             throw new Error("Input validation error");
-            return;
+
         }
-        // send an api call to register the contest and redirect to the waiting room
-        const id = "soat";
-        router.replace(`/contest/waiting-room/${id}`)
+        const {data} = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contest/create`,parsedData.data,{
+            headers:{
+                Authorization: "Bearer "+session.data?.user.token
+            }
+        })
+        const id = data.contestId;
+        if(id)router.replace(`/contest/waiting-room/${id}`);
+        else throw new Error("Something is wrong. Please try again");
     }
     return(
         <Card>

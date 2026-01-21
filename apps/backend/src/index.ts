@@ -3,7 +3,9 @@ import { submissionRouter } from './routers/submission-router.js';
 import { contestRouter } from './routers/contest-router.js';
 import { AuthRouter } from './routers/auth-router.js';
 import cors from 'cors';
+import dotenv from 'dotenv'
 
+dotenv.config();
 const app = express();
 const port = 3001;
 

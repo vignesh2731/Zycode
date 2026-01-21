@@ -85,5 +85,8 @@ export const authOptions:AuthOptions = {
             if(url.startsWith("/"))return `${baseUrl}/${url}`;
             return url;
         }
+    },
+    pages:{
+        signIn: '/auth/login'
     }
 }

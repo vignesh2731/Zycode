@@ -4,10 +4,12 @@ import { Button } from "./Button"
 import { InputBox } from "./Inputbox"
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import axios from "axios";
 
 enum ContestJoinStatus{
     Correct = "Joined Successfully",
-    Wrong = "Wrong Contest ID"
+    Wrong = "Wrong Contest ID",
+    TryAgain = "Try Again in 10 secs"
 }
 
 export function InputWithButton() {
@@ -15,15 +17,23 @@ export function InputWithButton() {
     const [id,setId] = useState("");
     const router = useRouter();
     const session = useSession();
-    const userId = session.data?.user.id;
+
     async function onSubmit(){
-        // send req to the backend and based on that route to the page or display error message
-        /// const res = await axios.post("URL",{id:id,headers:authorization:jwt});
-        const res = null;
-        if(res){
+      if(!session.data?.user.token){
+        setMsg(ContestJoinStatus.TryAgain);
+        return;
+      }
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contest/join`,{
+          contestId:id
+        },{
+          headers:{
+            Authorization: "Bearer "+session.data?.user.token
+          }
+        })
+        if(res.data.msg!=='Contest Not found'){
             setMsg(ContestJoinStatus.Correct);
             await new Promise(r=>setTimeout(r,2000));
-            // router.push(`contest/waiting-room/${id}`);
+            router.push(`/contest/waiting-room/${id}`);
         }
         else{
             setMsg(ContestJoinStatus.Wrong);

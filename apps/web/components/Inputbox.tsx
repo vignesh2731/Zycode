@@ -8,7 +8,7 @@ type ComponentProps = {
 
 export function InputBox({placeholder,type,className,onChange}:ComponentProps){
     return (
-        <input placeholder={`${placeholder}`} className={`p-2 rounded-sm border border-slate-800 ${className}`} onChange={(e)=>{
+        <input placeholder={`${placeholder}`} type={type} className={`p-2 rounded-sm border border-slate-800 ${className}`} onChange={(e)=>{
             if(onChange)onChange(e.target.value)
         }}>
         </input>
