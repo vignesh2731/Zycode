@@ -82,7 +82,7 @@ export const authOptions:AuthOptions = {
             return session;
         },
         redirect({url,baseUrl}){
-            if(url.startsWith("/"))return `${baseUrl}/${url}`;
+            if(url.startsWith("/"))return `${baseUrl}${url}`;
             return url;
         }
     },

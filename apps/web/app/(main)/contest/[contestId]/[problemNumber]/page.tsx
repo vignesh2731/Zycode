@@ -11,11 +11,12 @@ export default async function Page({params}:{params: Promise<{contestId:string,p
     if(!session?.user){
         redirect('/api/auth/signup');
     }
-    const { data } = await axios.get(`${process.env.BACKEND_URL}/api/contest/${contestId}/${problemNumber}`,{
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contest/problems/${contestId}/${problemNumber}`,{
         headers:{
-            Authorization: session.user.token
+            Authorization: "Bearer "+session.user.token
         }
     })
+    console.log(data);
     if(!data){
         throw new Error("Invalid Contest ID or Problem Number")
     }

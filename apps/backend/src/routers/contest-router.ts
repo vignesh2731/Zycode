@@ -141,7 +141,6 @@ contestRouter.get("/get-problems/:contestId",async(req,res)=>{
 
 contestRouter.get("/problems/:contestId/:problemNumber",async(req:CustomRequest,res)=>{
     const { contestId, problemNumber } = req.params;
-
     const problem = await prisma.problem.findFirst({
         where:{
             problemNumber: Number(problemNumber),
@@ -191,4 +190,39 @@ contestRouter.get("/result/:contestId",async(req:CustomRequest,res)=>{
     })
 
     res.json({name:data?.name});
+})
+
+contestRouter.get("/pariticipants/:contestId",async(req,res)=>{
+    const { contestId } = req.params;
+    const data = await prisma.contest.findFirst({
+        where:{
+            id:contestId
+        },
+        select:{
+            participatedUsers:{
+                select:{
+                    name: true 
+                }
+            }
+        }
+    })
+    const names = data?.participatedUsers.map((d)=>d.name);
+    res.json({
+        names
+    })  
+})
+
+contestRouter.get("/maker/:contestId",async(req,res)=>{
+    const { contestId } = req.params;
+    const data = await prisma.contest.findFirst({
+        where:{
+            id: contestId
+        },
+        select:{
+            createdBy:true
+        }
+    })
+    res.json({
+        maker: data?.createdBy
+    })
 })
