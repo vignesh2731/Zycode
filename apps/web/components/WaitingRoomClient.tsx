@@ -30,6 +30,7 @@ export function WaitingRoomClient({id,maker}:{id:string,maker:boolean}){
         <div className="flex justify-end gap-10 pr-20">
             {maker && <Button label="Start" className="w-fit p-3 rounded-sm hover:bg-green-300 font-[550] bg-green-200 text-green-600"
            onClick={()=>{
+            // set contest Status to Started 
                 socket?.send(JSON.stringify({
                     type: "contest_started",
                     userId,

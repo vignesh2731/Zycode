@@ -71,4 +71,5 @@ model TestCase{
 enum ContestStatus {
   Completed 
   NotCompleted 
+  Started
 }

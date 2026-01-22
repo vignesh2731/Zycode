@@ -226,3 +226,35 @@ contestRouter.get("/maker/:contestId",async(req,res)=>{
         maker: data?.createdBy
     })
 })
+
+contestRouter.post("/question-status",async(req,res)=>{
+    const{ contestId, problemNumber } = req.body;
+    const response = await prisma.contest.findFirst({
+        where:{
+            id: contestId,
+            problems:{
+                some:{
+                    problemNumber:problemNumber
+                }
+            }
+        },
+        select:{
+            problems:{
+                select:{
+                    completedBy:true
+                }
+            }
+        }
+    })
+    const isCompleted = response?.problems[0]?.completedBy;
+    if(isCompleted){
+        res.json({
+            msg: "Question Completed"
+        })
+    }
+    else{
+        res.json({
+            msg: "Proceed"
+        })
+    }
+})

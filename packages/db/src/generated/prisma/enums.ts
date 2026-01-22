@@ -11,7 +11,8 @@
 
 export const ContestStatus = {
   Completed: 'Completed',
-  NotCompleted: 'NotCompleted'
+  NotCompleted: 'NotCompleted',
+  Started: 'Started'
 } as const
 
 export type ContestStatus = (typeof ContestStatus)[keyof typeof ContestStatus]

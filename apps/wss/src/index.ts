@@ -23,11 +23,9 @@ wss.addListener("connection",(ws)=>{
         if(parsedData.type==='submission_status'){
             if(parsedData.accepted){
                 const clients = contestRoom.get(parsedData.contestId);
-                console.log(`Sending correct message to contest ${parsedData.contestId}, clients:`, clients?.length || 0);
                 clients?.forEach(user=>{
                     if(user.readyState === WebSocket.OPEN){
                         user.send(JSON.stringify({msg:"Correct",solver: parsedData.name,ended: parsedData.ended, winner:parsedData.winner}));
-                        console.log("Sent correct message to client");
                     } else {
                         console.log("Client socket not open, readyState:", user.readyState);
                     }
@@ -36,7 +34,6 @@ wss.addListener("connection",(ws)=>{
 
             else{
                 const userSocket = userRoom.get(parsedData.userId);
-                console.log(`Sending wrong message to user ${parsedData.userId}, socket exists:`, !!userSocket);
                 if(userSocket && userSocket.readyState === WebSocket.OPEN){
                     userSocket.send(JSON.stringify({msg:"Wrong"}));
                 } else {
