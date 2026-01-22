@@ -16,9 +16,41 @@ export function CodeEditorClient({contestId,problemNumber}:{contestId:string,pro
     const userId = session.data?.user.id 
     const router = useRouter();
     useEffect(()=>{
+        // Don't create socket if userId is not available yet
+        if(!userId){
+            console.log("Waiting for userId...");
+            return;
+        }
+
         const socket = WebSocketSingleton.getInstance(Number(userId),contestId);
-        socket?.addEventListener('message',async(event)=>{
-            const message = event.data.toString('utf-8');
+        if(socket.readyState === WebSocket.OPEN){
+            console.log("SOCKET ALREADY OPEN", socket.url);
+            socket.send(JSON.stringify({
+                type: 'init',
+                contestId: contestId,
+                userId: Number(userId)
+            }));
+        }
+
+        const handleOpen = () => {
+            console.log("SOCKET OPENED", socket.url);
+            socket.send(JSON.stringify({
+                type: 'init',
+                contestId: contestId,
+                userId: Number(userId)
+            }));
+        };
+
+        const handleError = (error: Event) => {
+            console.error("WebSocket error:", error);
+        };
+
+        const handleClose = (event: CloseEvent) => {
+            console.log("WebSocket closed:", event.code, event.reason);
+        };
+
+        const handleMessage = async(event: MessageEvent) => {
+            const message = event.data;
             const parsedData = JSON.parse(message);
             if(parsedData.msg==='Wrong'){
                 setSubmissionStatus('Wrong');
@@ -40,8 +72,22 @@ export function CodeEditorClient({contestId,problemNumber}:{contestId:string,pro
                     router.replace(`/contest/${contestId}/${Number(problemNumber)+1}`)
                 }
             }
-        })
-    })
+        };
+
+        socket.addEventListener("open", handleOpen);
+        socket.addEventListener('message', handleMessage);
+        socket.addEventListener('error', handleError);
+        socket.addEventListener('close', handleClose);
+        console.log("ADDED LISTENERS");
+
+        return () => {
+            console.log("Cleaning up socket listeners");
+            socket.removeEventListener("open", handleOpen);
+            socket.removeEventListener("message", handleMessage);
+            socket.removeEventListener("error", handleError);
+            socket.removeEventListener("close", handleClose);
+        };
+    },[userId, contestId, problemNumber, router])
     return (
         <div className="flex flex-col gap-1 relative">
             <div className="flex justify-end gap-10 -mt-10 items-center">
@@ -57,14 +103,14 @@ export function CodeEditorClient({contestId,problemNumber}:{contestId:string,pro
                 </select>
                 <Button label="Submit" className={`px-4 w-fit p-2 rounded-md border border-slate-200 text-green-500 font-[550] bg-gray-100 hover:bg-gray-300`} onClick={()=>{
                     setSubmissionStatus('Loading...');
-                    axios.post(`${process.env.BACKEND_URL}/api/submission/submit`,{
+                    axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/submission/submit`,{
                         code:code,
                         language:language,
                         contestId:contestId,
                         problemId:problemNumber
                     },{
                         headers:{
-                            Authorization: session.data?.user.token
+                            Authorization: "Bearer "+session.data?.user.token
                         }
                     })
                 }} />

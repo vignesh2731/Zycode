@@ -11,14 +11,22 @@ async function main(){
     await redis.connect();
     const socket = new WebSocket("ws://localhost:8080");
 
+    // Wait for WebSocket to open before processing submissions
+    await new Promise<void>((resolve, reject) => {
+        socket.onopen = () => {
+            resolve();
+        };
+        socket.onerror = (error) => {
+            console.error("Worker WebSocket error:", error);
+            reject(error);
+        };
+    });
 
     while(1){
         const response = await redis.lPop("submissions");
         if(!response)continue;
 
         const parsedData = JSON.parse(response) as ParsedDataType;
-        console.log(parsedData);
-
         const { problemId, userId, contestId, code,language} = parsedData;
         const [data,solver,totalProblems,problemMetadata] = await Promise.all([prisma.testCase.findMany({
                 where:{
@@ -68,7 +76,7 @@ async function main(){
         const testcases = data.map(d=>d.testCase);
         const ans = func(code,testcases);
         let winner: undefined | string;
-        let accepted = true,ended = false;
+        let accepted = false,ended = false;
         // Call to the code executor goes from here
 
         if(accepted){
@@ -134,7 +142,12 @@ async function main(){
             ended,
             winner
         }
-        socket.send(JSON.stringify(dataToBeSent));
+        
+        if(socket.readyState === WebSocket.OPEN){
+            socket.send(JSON.stringify(dataToBeSent));
+        } else {
+            console.error("Worker WebSocket not open, readyState:", socket.readyState);
+        }
     }
 }
 

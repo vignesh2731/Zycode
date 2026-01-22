@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { createClient } from "redis";
-
-
 import type { CustomRequest } from "../types/types.js";
 import { SubmissionDataSchema } from "@repo/zod";
+import { middleware } from "../middleware/middlware.js";
 
 export const submissionRouter:Router = Router();
-
+submissionRouter.use(middleware);
 const redis = createClient({url:'redis://localhost:6379'});
 async function connect(){
     await redis.connect();

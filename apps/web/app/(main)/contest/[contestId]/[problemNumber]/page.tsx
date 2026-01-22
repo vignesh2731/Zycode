@@ -16,7 +16,6 @@ export default async function Page({params}:{params: Promise<{contestId:string,p
             Authorization: "Bearer "+session.user.token
         }
     })
-    console.log(data);
     if(!data){
         throw new Error("Invalid Contest ID or Problem Number")
     }
