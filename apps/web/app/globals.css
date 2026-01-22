@@ -79,3 +79,29 @@
   --border: oklch(1 0 0 / 10%);
   --ring: oklch(0.556 0 0);
 }
+
+:root {
+  --blue-500: #3b82f6;
+  --blue-400: #60a5fa;
+  --blue-300: #93c5fd;
+  --indigo-300: #a5b4fc;
+  --violet-200: #ddd6fe;
+
+  --white: #ffffff;
+  --black: #000000;
+  --transparent: transparent;
+}
+
+.dark {
+  --white: #000000;
+  --black: #ffffff;
+}
+
+@keyframes aurora {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+.animate-aurora {
+  animation: aurora 20s linear infinite;
+}
