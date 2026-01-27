@@ -46,7 +46,7 @@ export default async function Page({params}:{params: Promise<{contestId:string,p
     const description = data.title;
 
     return(
-        <div className="grid md:grid-cols-2 gap-10">
+        <div className="grid md:grid-cols-2 gap-10 pt-12">
             <QuestionDisplay title={title} description={description}/>
             <CodeEditorClient contestId={contestId} problemNumber={problemNumber}/>
         </div>

@@ -4,13 +4,15 @@ import Image from "next/image";
 import { useState } from "react";
 import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
+import { AuroraBackground } from "./ui/aurora-background";
+import { motion } from "framer-motion";
 
 export function Navbar({children}:{children:React.ReactNode}){
     const navBar = [{name:"Home",href:'dashboard'},{name:"Contest",href:"contest/create"},{name:"Report",href:'report'}];
     const [theme,setTheme] = useState<'light'|'dark'>("light")
     const router = useRouter();
     return(
-        <div className={` h-screen flex flex-col gap-2 text-xs md:text-sm lg:text-md`}>
+        <div className={` h-screen flex flex-col text-xs md:text-sm lg:text-md`}>
             <div className={`grid grid-cols-2 md:px-10 p-4  border-b border-slate-100 shadow-sm font-sans`}>
                 <div className="flex gap-4 md:gap-16 items-center">
                     <Image src={'/logo.png'} alt="" width={40} height={20} className="cursor-pointer" onClick={()=>{
@@ -36,9 +38,12 @@ export function Navbar({children}:{children:React.ReactNode}){
                     </svg>
                 </div>
             </div>
-            <div className={`px-2 md:px-10 lg:px-20 pt-10`}>
-                {children}
-            </div>
+            <AuroraBackground>
+                <motion.div className="relative gap-4 px-4 min-h-screen">
+                    {children}
+                </motion.div>
+            </AuroraBackground>
+
         </div>
     )
 }

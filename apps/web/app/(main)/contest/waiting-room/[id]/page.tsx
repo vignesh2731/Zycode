@@ -39,7 +39,7 @@ export default async function Page({params}:{params: Promise<{id:string}>}){
     }
     const participants:string[] = data.names 
     return(
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pt-16">
             <div className="flex justify-between md:pl-16">
                 <div>
                     <p className="text-xl">{`Contest ID - ${id}`}</p>

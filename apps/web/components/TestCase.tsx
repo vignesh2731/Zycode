@@ -11,7 +11,7 @@ type ComponentProps = {
 
 export function TestCase({idx,problemNo,testcaseAction,resultAction}:ComponentProps){
     return(
-        <div className="grid grid-cols-2 pt-4">
+        <div className="grid grid-cols-2 gap-10 pt-4">
             <div className="flex flex-col gap-2 items-center pt-6">
                 <div className="text-xl font-[550]">
                     {`Testcase - ${idx+1}`}

@@ -9,7 +9,7 @@ export default async function Page(){
         redirect("/api/auth/signin")
     }
     return(
-        <div>
+        <div className="pt-20">
             <ContestJoin/>
         </div>
     )
