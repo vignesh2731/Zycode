@@ -1,24 +1,28 @@
-import { GalleryVerticalEnd } from "lucide-react"
-
 import { SignupForm } from "@/components/signup-form"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"
+import { Code2 } from "lucide-react"
+import Link from "next/link"
 
 export default async function SignupPage() {
-  const session = await getServerSession(authOptions);
-  if(session?.user){
-    redirect("/dashboard");
+  const session = await getServerSession(authOptions)
+  if (session?.user) {
+    redirect("/dashboard")
   }
+
   return (
-    <div className="bg-[#F7F7F7] flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <a href="#" className="flex items-center gap-2 self-center font-medium">
+        <Link
+          href="/"
+          className="flex items-center gap-2 self-center font-medium"
+        >
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-            <GalleryVerticalEnd className="size-4" />
+            <Code2 className="size-4" />
           </div>
           ZyCode
-        </a>
+        </Link>
         <SignupForm />
       </div>
     </div>

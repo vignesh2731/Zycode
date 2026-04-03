@@ -3,10 +3,18 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
+import { Button } from "@/components/ui/button"
+import { Trophy } from "lucide-react"
 
 const Confetti = dynamic(() => import("react-confetti"), { ssr: false })
 
-export default function WinnerPage({ winner, contestCode }: { winner: string, contestCode: string }) {
+export default function WinnerPage({
+  winner,
+  contestCode,
+}: {
+  winner: string
+  contestCode: string
+}) {
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
 
   useEffect(() => {
@@ -19,7 +27,7 @@ export default function WinnerPage({ winner, contestCode }: { winner: string, co
   }, [])
 
   return (
-    <div className="relative max-h-screen h-full min-w-screen -mt-12 -ml-20 flex flex-col justify-center gap-20 items-center bg-linear-to-r from-purple-500 via-pink-500 to-yellow-400 text-white">
+    <div className="relative flex min-h-[80vh] flex-col items-center justify-center gap-8 text-center">
       <Confetti
         width={windowSize.width}
         height={windowSize.height}
@@ -27,19 +35,20 @@ export default function WinnerPage({ winner, contestCode }: { winner: string, co
         recycle={false}
       />
 
-      <div className="text-4xl font-extrabold drop-shadow-lg animate-bounce">
-        🎉 The winner of the contest <span className="text-yellow-300">{contestCode}</span> is 
-        <span className="text-green-300"> {winner} 🎉
-        </span>
+      <div className="flex flex-col items-center gap-4">
+        <Trophy className="size-16 text-yellow-500" />
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
+          Contest {contestCode} Winner
+        </h1>
+        <p className="text-xl text-muted-foreground sm:text-2xl">
+          Congratulations to{" "}
+          <span className="font-bold text-primary">{winner}</span>!
+        </p>
       </div>
 
-
-      <Link 
-        href="/dashboard"
-        className="px-6 py-3 bg-white text-purple-700 font-bold rounded-2xl shadow-lg hover:scale-110 transition-all"
-      >
-        Go to Dashboard
-      </Link>
+      <Button asChild size="lg">
+        <Link href="/dashboard">Go to Dashboard</Link>
+      </Button>
     </div>
   )
 }
