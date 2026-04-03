@@ -1,37 +1,37 @@
 "use client"
 
-import { InputBox } from "./Inputbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 type ComponentProps = {
-    idx: number;
-    problemNo: number;
-    testcaseAction: (value:string,problemNo:number,idx:number)=>void;
-    resultAction: (value:string,problemNo:number,idx:number)=>void;
+  idx: number
+  problemNo: number
+  testcaseAction: (value: string, problemNo: number, idx: number) => void
+  resultAction: (value: string, problemNo: number, idx: number) => void
 }
 
-export function TestCase({idx,problemNo,testcaseAction,resultAction}:ComponentProps){
-    return(
-        <div className="grid grid-cols-2 gap-10 pt-4">
-            <div className="flex flex-col gap-2 items-center pt-6">
-                <div className="text-xl font-[550]">
-                    {`Testcase - ${idx+1}`}
-                </div>
-                <div>
-                    <InputBox placeholder="Enter the testcase" className="w-fit p-3 min-w-60 max-w-full" onChange={(value)=>{
-                        testcaseAction(value,problemNo,idx);
-                    }} />
-                </div>
-            </div>
-            <div className="flex flex-col gap-2 items-center pt-6">
-                <div className="text-xl font-[550]">
-                    {`Result - ${idx+1}`}
-                </div>
-                <div>
-                    <InputBox placeholder="Enter the result" className="w-fit p-3 min-w-60 max-w-full" onChange={(value)=>{
-                        resultAction(value,problemNo,idx);
-                    }}/>
-                </div>
-            </div>
-        </div>
-    )
+export function TestCase({
+  idx,
+  problemNo,
+  testcaseAction,
+  resultAction,
+}: ComponentProps) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-md border border-dashed bg-muted/30 p-4">
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">{`Input ${idx + 1}`}</Label>
+        <Input
+          placeholder="e.g. [2, 7, 11, 15], 9"
+          onChange={(e) => testcaseAction(e.target.value, problemNo, idx)}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">{`Expected Output ${idx + 1}`}</Label>
+        <Input
+          placeholder="e.g. [0, 1]"
+          onChange={(e) => resultAction(e.target.value, problemNo, idx)}
+        />
+      </div>
+    </div>
+  )
 }

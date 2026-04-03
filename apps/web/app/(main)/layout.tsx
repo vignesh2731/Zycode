@@ -1,17 +1,26 @@
-import { Navbar } from "@/components/Navbar";
-import { authOptions } from "@/lib/auth";
-import SessionProvider from "@/providers/Session";
-import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth"
+import SessionProvider from "@/providers/Session"
+import { getServerSession } from "next-auth"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { AppHeader } from "@/components/app-header"
 
-export default async function RootLayout({
+export default async function MainLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions)
+
   return (
-      <div>
-        <SessionProvider session={session}><Navbar children={children} /></SessionProvider>
-      </div>
-  );
+    <SessionProvider session={session}>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <AppHeader />
+          <main className="flex-1 p-4 md:p-6">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </SessionProvider>
+  )
 }
