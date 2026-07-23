@@ -20,11 +20,11 @@ jobs:
           tenant-id: ${{ secrets.SAFEDEP_TENANT_ID }}
 
       # Your usual language setup and install
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "24"
+          bun-version: latest
 
-      - run: npm ci
+      - run: bun install --frozen-lockfile
 
       # Enforce the result and flush events
       - name: Stop proxy
