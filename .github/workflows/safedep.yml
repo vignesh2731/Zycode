@@ -22,7 +22,7 @@ jobs:
       # Your usual language setup and install
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: "1.3.5"
 
       - run: bun install --frozen-lockfile
 
