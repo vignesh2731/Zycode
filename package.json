@@ -1,6 +1,7 @@
 {
   "name": "blitz",
   "private": true,
+  "description": "A real-time competitive coding contest platform.",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -9,6 +10,7 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "dotenv": "^17.4.2",
     "prettier": "^3.7.4",
     "turbo": "^2.7.2",
     "typescript": "5.9.2"
