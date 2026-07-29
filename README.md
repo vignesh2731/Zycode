@@ -131,3 +131,7 @@ Code submissions can be made in:
 - Real-time updates: correct answers and contest end events are broadcast instantly to all participants
 - Automatic winner determination based on number of problems solved
 - Monaco editor for code input
+
+## License
+
+This project is licensed under the MIT License.
