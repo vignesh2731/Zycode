@@ -1,15 +1,18 @@
-"use client";
+"use client"
 
-import Editor, { OnMount } from "@monaco-editor/react";
+import Editor, { OnMount } from "@monaco-editor/react"
+import { useTheme } from "next-themes"
 
 type Props = {
-  code: string;
-  setCodeAction: (val: string) => void;
-};
+  code: string
+  setCodeAction: (val: string) => void
+}
 
 export default function CodeEditor({ code, setCodeAction }: Props) {
-  const handleEditorDidMount: OnMount = (editor, monaco) => {
-    monaco.editor.defineTheme("zinc-theme", {
+  const { resolvedTheme } = useTheme()
+
+  const handleEditorDidMount: OnMount = (_editor, monaco) => {
+    monaco.editor.defineTheme("zinc-light", {
       base: "vs",
       inherit: true,
       rules: [],
@@ -22,17 +25,33 @@ export default function CodeEditor({ code, setCodeAction }: Props) {
         "editorIndentGuide.background": "#e4e4e7",
         "editorIndentGuide.activeBackground": "#a1a1aa",
       },
-    });
-
-    monaco.editor.setTheme("zinc-theme");
-  };
+    })
+    monaco.editor.defineTheme("zinc-dark", {
+      base: "vs-dark",
+      inherit: true,
+      rules: [],
+      colors: {
+        "editor.background": "#1c1c1c",
+        "editorLineNumber.foreground": "#71717a",
+        "editorLineNumber.activeForeground": "#d4d4d8",
+        "editor.lineHighlightBackground": "#27272a",
+        "editor.lineHighlightBorder": "#3f3f46",
+        "editorIndentGuide.background": "#3f3f46",
+        "editorIndentGuide.activeBackground": "#71717a",
+      },
+    })
+    monaco.editor.setTheme(
+      resolvedTheme === "dark" ? "zinc-dark" : "zinc-light"
+    )
+  }
 
   return (
-    <div className="h-[500px] min-h-[550px] max-h-[550px] border border-zinc-300 rounded-md overflow-hidden bg-zinc-50">
+    <div className="h-full overflow-hidden">
       <Editor
         height="100%"
         language="cpp"
         value={code}
+        theme={resolvedTheme === "dark" ? "zinc-dark" : "zinc-light"}
         onChange={(value) => setCodeAction(value ?? "")}
         onMount={handleEditorDidMount}
         options={{
@@ -41,11 +60,9 @@ export default function CodeEditor({ code, setCodeAction }: Props) {
           scrollBeyondLastLine: false,
           wordWrap: "on",
           renderLineHighlight: "all",
-          guides: {
-            indentation: true,
-          },
+          guides: { indentation: true },
         }}
       />
     </div>
-  );
+  )
 }

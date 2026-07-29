@@ -2,11 +2,12 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google";
 import axios from 'axios';
 import { AuthOptions } from 'next-auth'
+import { DefaultSession } from "next-auth";
 
 
 declare module "next-auth" {
-    interface Session {
-      user: {
+    interface Session extends DefaultSession {
+      user: DefaultSession["user"] & {
         id: string;
         token?: string | null;
       };
